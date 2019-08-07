@@ -3,10 +3,15 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const app = express();
 const mongoose = require("mongoose");
-const config = require('./config')
-
+const config = require('./config');
 const Product = require('./model/product');
 const Order = require('./model/order');
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 mongoose.Promise = global.Promise;
 mongoose.connect(
@@ -18,7 +23,6 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../dist')))
 
 app.get('/api/products', (req, res) => {
-  res.header('Access-Control-Allow-Origin','*');
   Product.find().then(rec => {
     if(rec) {
       res.status(200).json(rec);
@@ -27,8 +31,8 @@ app.get('/api/products', (req, res) => {
     }
   })
 })
+/*
 app.get('/api/orders', (req, res) => {
-  
   Order.find().then(rec => {
     if(rec) {
       res.status(200).json(rec);
@@ -36,12 +40,8 @@ app.get('/api/orders', (req, res) => {
       res.status(200).json([]);
     }
   })
-})
+}) */
 app.post('/api/checkout', (req, res) => {
- 
-
- res.header('Access-Control-Allow-Origin', '*');
- res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   const newOrder = new Order({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -54,16 +54,22 @@ app.post('/api/checkout', (req, res) => {
     items: req.body.items.map(item => item._id) || []
   })
   newOrder.save().then(rec => {
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
     res.status(200).json(rec);
     
   }, (err) => {
     res.status(500).json({error: 'error'})
-    console.log("Errorsd sdf dwfdw");
   });
 })
+app.get('/api/orders', (req, res) => {
+  Order.find()
+  .then(rec => {
+    res.status(200).json(rec);
+  })
+  .catch(err => {
+    res.status(500).json(err);
+  })
+})
 app.get("*", (req, res) => {
- 
   res.sendFile(path.join(__dirname, '../dist/index.html'))
 });
 
