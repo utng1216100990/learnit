@@ -62,6 +62,8 @@ app.post('/api/checkout', (req, res) => {
 })
 app.get('/api/orders', (req, res) => {
   Order.find()
+  .populate('items')
+  .exec()
   .then(rec => {
     res.status(200).json(rec);
   })
