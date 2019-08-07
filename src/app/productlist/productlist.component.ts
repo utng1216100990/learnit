@@ -16,7 +16,9 @@ export class ProductlistComponent implements OnInit {
       this.products = [...data];
     });
   }
-
+ /* returnToMenu() {
+    document.getElementsByClassName("btn").className = "btn";
+}*/
   addItemToCart(item) {
     this.productsService.addToCart(item._id);
   }
